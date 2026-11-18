@@ -203,6 +203,8 @@ contract LendingMarket {
         require(amount > 0, "zero amount");
         require(collateralBalance[msg.sender] >= amount, "insufficient collateral");
 
+        accrueInterest();
+
         collateralBalance[msg.sender] -= amount;
         totalCollateral -= amount;
 

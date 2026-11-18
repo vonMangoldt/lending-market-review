@@ -259,4 +259,41 @@ contract LendingMarketTest is Test {
             5_000e18
         );
     }
+
+    function test_withdrawCollateralAccruesInterestFirst()
+        public
+    {
+        _postCollateral(
+            borrower,
+            10e18
+        );
+
+        vm.prank(
+            borrower
+        );
+
+        market.borrow(
+            15_000e18
+        );
+
+        vm.warp(
+            block.timestamp + 365 days
+        );
+
+        wethOracle.setPrice(
+            2_000e18
+        );
+
+        vm.prank(
+            borrower
+        );
+
+        vm.expectRevert(
+            "would be undercollateralized"
+        );
+
+        market.withdrawCollateral(
+            0.4e18
+        );
+    }
 }
