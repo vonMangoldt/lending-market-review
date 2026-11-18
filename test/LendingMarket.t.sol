@@ -148,4 +148,65 @@ contract LendingMarketTest is Test {
 
         assertTrue(market.paused());
     }
+
+    // ---- Regression tests for the findings in the README ----
+
+    function test_liquidationSeizeIsPricedInCollateral()
+        public
+    {
+        uint256 collateralAmount = 10e18;
+        uint256 repayAmount = 1_000e18;
+
+        uint256 expectedSeize = repayAmount
+            * 1.10e18
+            / 1_800e18;
+
+        _postCollateral(
+            borrower,
+            collateralAmount
+        );
+
+        vm.prank(
+            borrower
+        );
+
+        market.borrow(
+            15_000e18
+        );
+
+        wethOracle.setPrice(
+            1_800e18
+        );
+
+        base.mint(
+            liquidator,
+            repayAmount
+        );
+
+        vm.startPrank(
+            liquidator
+        );
+
+        base.approve(
+            address(market),
+            type(uint256).max
+        );
+
+        market.liquidate(
+            borrower,
+            repayAmount
+        );
+
+        vm.stopPrank();
+
+        assertEq(
+            weth.balanceOf(liquidator),
+            expectedSeize
+        );
+
+        assertEq(
+            market.collateralBalance(borrower),
+            collateralAmount - expectedSeize
+        );
+    }
 }

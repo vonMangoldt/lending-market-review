@@ -261,7 +261,9 @@ contract LendingMarket {
         uint256 owed = borrowBalanceOf(borrower);
         if (repayAmount > owed) repayAmount = owed;
 
-        uint256 seizeAmount = (repayAmount * liquidationIncentive) / FACTOR;
+        uint256 seizeAmount = repayAmount
+            * liquidationIncentive
+            / getPrice();
         if (seizeAmount > collateralBalance[borrower]) {
             seizeAmount = collateralBalance[borrower];
         }
