@@ -296,4 +296,75 @@ contract LendingMarketTest is Test {
             0.4e18
         );
     }
+
+    function _accrueOneYearOfInterest()
+        internal
+    {
+        _postCollateral(
+            borrower,
+            10e18
+        );
+
+        vm.prank(
+            borrower
+        );
+
+        market.borrow(
+            10_000e18
+        );
+
+        vm.warp(
+            block.timestamp + 365 days
+        );
+
+        wethOracle.setPrice(
+            2_000e18
+        );
+
+        market.accrueInterest();
+    }
+
+    function test_borrowRoundsPrincipalUp()
+        public
+    {
+        address attacker = makeAddr(
+            "attacker"
+        );
+
+        _accrueOneYearOfInterest();
+
+        vm.prank(
+            attacker
+        );
+
+        vm.expectRevert(
+            "would be undercollateralized"
+        );
+
+        market.borrow(
+            1
+        );
+    }
+
+    function test_withdrawRoundsPrincipalUp()
+        public
+    {
+        address attacker = makeAddr(
+            "attacker"
+        );
+
+        _accrueOneYearOfInterest();
+
+        vm.prank(
+            attacker
+        );
+
+        vm.expectRevert(
+            "insufficient balance"
+        );
+
+        market.withdraw(
+            1
+        );
+    }
 }

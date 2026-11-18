@@ -173,7 +173,9 @@ contract LendingMarket {
         require(amount > 0, "zero amount");
         accrueInterest();
 
-        uint256 principal = _principalForSupply(amount);
+        uint256 principal = (amount * FACTOR + baseSupplyIndex - 1)
+            / baseSupplyIndex;
+
         require(supplyPrincipal[msg.sender] >= principal, "insufficient balance");
 
         supplyPrincipal[msg.sender] -= principal;
@@ -219,7 +221,9 @@ contract LendingMarket {
         require(amount > 0, "zero amount");
         accrueInterest();
 
-        uint256 principal = _principalForBorrow(amount);
+        uint256 principal = (amount * FACTOR + baseBorrowIndex - 1)
+            / baseBorrowIndex;
+
         borrowPrincipal[msg.sender] += principal;
         totalBorrowPrincipal += principal;
 
