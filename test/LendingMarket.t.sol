@@ -234,4 +234,29 @@ contract LendingMarketTest is Test {
             address(wethOracle)
         );
     }
+
+    function test_stalePriceBlocksBorrow()
+        public
+    {
+        _postCollateral(
+            borrower,
+            10e18
+        );
+
+        vm.warp(
+            block.timestamp + 2 hours
+        );
+
+        vm.prank(
+            borrower
+        );
+
+        vm.expectRevert(
+            "stale price"
+        );
+
+        market.borrow(
+            5_000e18
+        );
+    }
 }
