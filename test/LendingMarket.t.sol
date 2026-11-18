@@ -209,4 +209,29 @@ contract LendingMarketTest is Test {
             collateralAmount - expectedSeize
         );
     }
+
+    function test_guardianCannotSetOracle()
+        public
+    {
+        MockOracle otherOracle = new MockOracle(
+            1_000_000e18
+        );
+
+        vm.prank(
+            guardian
+        );
+
+        vm.expectRevert(
+            "not admin"
+        );
+
+        market.setOracle(
+            address(otherOracle)
+        );
+
+        assertEq(
+            address(market.oracle()),
+            address(wethOracle)
+        );
+    }
 }

@@ -343,7 +343,7 @@ contract LendingMarket {
     // Administration
     // -------------------------------------------------------------------------------------------
 
-    function setOracle(address newOracle) external onlyGuardian {
+    function setOracle(address newOracle) external onlyAdmin {
         require(newOracle != address(0), "zero oracle");
         oracle = IPriceOracle(newOracle);
         emit OracleUpdated(newOracle);
